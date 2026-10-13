@@ -405,6 +405,7 @@
     let peerConnection = null;
     let partnerId = null;
     let micEnabled = true;
+    let matchRequested = false;
     let pendingCandidates = [];
 
     const rtcConfig = {
@@ -418,8 +419,22 @@
       statusEl.textContent = message;
     }
 
+    function requestMatch() {
+      if (!localStream || !socket?.connected || matchRequested) return;
+
+      closePeerConnection();
+      partnerId = null;
+      matchRequested = true;
+      setStatus("FINDING A STRANGER...");
+      socket.emit("find_partner");
+    }
+
     function connectSocket() {
-      if (socket && socket.connected) return;
+      if (socket) {
+        if (socket.connected) requestMatch();
+        return;
+      }
+
       if (typeof io === "undefined") {
         setStatus("CONNECTION LIBRARY FAILED");
         return;
@@ -430,13 +445,21 @@
         reconnection: true
       });
 
-      socket.on("connect", () => setStatus("SERVER CONNECTED"));
+      socket.on("connect", () => {
+        if (localStream) {
+          requestMatch();
+        } else {
+          setStatus("SERVER CONNECTED");
+        }
+      });
 
-      socket.on("connect_error", () => {
+      socket.on("connect_error", (error) => {
+        console.error("Socket connection error:", error);
         setStatus("SERVER CONNECTION ERROR");
       });
 
       socket.on("waiting", () => {
+        matchRequested = true;
         partnerId = null;
         setStatus("WAITING FOR A STRANGER...");
       });
@@ -446,21 +469,28 @@
           ? data
           : data?.partnerId || data?.id || data?.socketId || null;
 
-        if (!partnerId || !localStream) return;
+        matchRequested = false;
 
-        setStatus("STRANGER CONNECTED");
+        if (!partnerId || !localStream) {
+          console.error("Matched event did not include a usable partner ID:", data);
+          setStatus("MATCH DATA ERROR");
+          return;
+        }
+
+        setStatus("STRANGER FOUND — CONNECTING...");
         await createPeerConnection();
 
         if (socket.id < partnerId) {
           try {
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
+
             socket.emit("webrtc_offer", {
               to: partnerId,
               offer: peerConnection.localDescription
             });
           } catch (error) {
-            console.error(error);
+            console.error("Offer error:", error);
             setStatus("CALL SETUP FAILED");
           }
         }
@@ -470,10 +500,12 @@
         try {
           const from = data?.from || data?.sender;
           const offer = data?.offer || data?.description;
+
           if (from) partnerId = from;
           if (!offer || !localStream) return;
 
           await createPeerConnection();
+
           await peerConnection.setRemoteDescription(
             new RTCSessionDescription(offer)
           );
@@ -488,7 +520,7 @@
 
           await flushCandidates();
         } catch (error) {
-          console.error(error);
+          console.error("Offer handling error:", error);
           setStatus("CALL SETUP FAILED");
         }
       });
@@ -501,9 +533,10 @@
           await peerConnection.setRemoteDescription(
             new RTCSessionDescription(answer)
           );
+
           await flushCandidates();
         } catch (error) {
-          console.error(error);
+          console.error("Answer handling error:", error);
         }
       });
 
@@ -520,17 +553,19 @@
             );
           }
         } catch (error) {
-          console.error(error);
+          console.error("ICE candidate error:", error);
         }
       });
 
       socket.on("partner_disconnected", () => {
         closePeerConnection();
         partnerId = null;
+        matchRequested = false;
         setStatus("STRANGER DISCONNECTED");
       });
 
       socket.on("disconnect", () => {
+        matchRequested = false;
         setStatus("SERVER DISCONNECTED");
       });
     }
@@ -561,9 +596,15 @@
         startBtn.disabled = true;
 
         connectSocket();
-        setStatus("CAMERA READY");
+
+        // Start matchmaking immediately if the socket is already connected.
+        if (socket?.connected) {
+          requestMatch();
+        } else {
+          setStatus("CONNECTING TO SERVER...");
+        }
       } catch (error) {
-        console.error(error);
+        console.error("Camera error:", error);
         setStatus("CAMERA / MIC PERMISSION DENIED");
       }
     }
@@ -599,10 +640,14 @@
       peerConnection.onconnectionstatechange = () => {
         if (!peerConnection) return;
 
-        if (peerConnection.connectionState === "connected") {
+        const state = peerConnection.connectionState;
+
+        if (state === "connected") {
           setStatus("YOU ARE CONNECTED");
-        } else if (peerConnection.connectionState === "failed") {
+        } else if (state === "failed") {
           setStatus("CONNECTION FAILED — TRY NEXT");
+        } else if (state === "disconnected") {
+          setStatus("CONNECTION INTERRUPTED");
         }
       };
     }
@@ -619,7 +664,7 @@
             new RTCIceCandidate(candidate)
           );
         } catch (error) {
-          console.error(error);
+          console.error("Queued ICE candidate error:", error);
         }
       }
     }
@@ -637,26 +682,15 @@
       pendingCandidates = [];
     }
 
-    function findPartner() {
-      if (!socket?.connected) {
-        setStatus("CONNECTING TO SERVER...");
-        connectSocket();
-        return;
-      }
-
-      closePeerConnection();
-      partnerId = null;
-      setStatus("FINDING A STRANGER...");
-      socket.emit("find_partner");
-    }
-
     function nextPartner() {
       if (!localStream || !socket?.connected) return;
 
       closePeerConnection();
       partnerId = null;
+      matchRequested = false;
+
       socket.emit("next_partner");
-      setStatus("FINDING A STRANGER...");
+      requestMatch();
     }
 
     function stopCamera() {
@@ -676,12 +710,15 @@
       }
 
       partnerId = null;
+      matchRequested = false;
       micEnabled = true;
+
       startBtn.disabled = false;
       micBtn.disabled = true;
       nextBtn.disabled = true;
       stopBtn.disabled = true;
       micBtn.textContent = "MIC ON";
+
       setStatus("READY TO CONNECT");
     }
 
@@ -689,6 +726,7 @@
       if (!localStream) return;
 
       micEnabled = !micEnabled;
+
       localStream.getAudioTracks().forEach((track) => {
         track.enabled = micEnabled;
       });
@@ -702,14 +740,14 @@
     nextBtn.addEventListener("click", nextPartner);
     stopBtn.addEventListener("click", stopCamera);
 
-    // Block two-finger pinch gestures where the browser permits it.
+    // Best-effort pinch-zoom prevention on touch devices.
     document.addEventListener("touchmove", (event) => {
       if (event.touches && event.touches.length > 1) {
         event.preventDefault();
       }
     }, { passive: false });
 
-    // Block double-tap zoom where supported.
+    // Best-effort double-tap zoom prevention.
     let lastTouchEnd = 0;
 
     document.addEventListener("touchend", (event) => {
@@ -722,7 +760,7 @@
       lastTouchEnd = now;
     }, { passive: false });
 
-    // Prevent browser gesture events where supported.
+    // Prevent Safari gesture zoom where supported.
     ["gesturestart", "gesturechange", "gestureend"].forEach((type) => {
       document.addEventListener(type, (event) => {
         event.preventDefault();
