@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,6 +106,21 @@ h1 {
   -webkit-text-stroke: 2.5px var(--white);
   paint-order: stroke fill;
   text-shadow: 4px 4px 0 var(--white), 8px 8px 0 var(--black);
+}
+
+/* NEW: GODFATHER TAGLINE */
+.godfather-tagline {
+  margin: 22px auto 0;
+  padding: 8px 12px;
+  max-width: 100%;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(15px, 3.2vw, 25px);
+  line-height: 1.5;
+  color: var(--black);
+  -webkit-text-stroke: 1px var(--white);
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 var(--white);
+  letter-spacing: .5px;
 }
 
 .hero-description {
@@ -348,6 +362,14 @@ footer p {
     text-shadow: 3px 3px 0 var(--white), 6px 6px 0 var(--black);
   }
 
+  /* NEW: MOBILE TAGLINE */
+  .godfather-tagline {
+    margin-top: 19px;
+    padding: 6px 4px;
+    font-size: clamp(14px, 4vw, 20px);
+    line-height: 1.5;
+  }
+
   .hero-description {
     margin-top: 25px;
     font-size: 14px;
@@ -493,6 +515,11 @@ footer p {
     <div class="sticker">ENTER AT YOUR OWN RISK!</div>
 
     <h1>KALYUG<br>LIVE</h1>
+
+    <p class="godfather-tagline">
+      KALYUG !<br>
+      Only God Can Be the Godfather
+    </p>
 
     <p class="hero-description">
       YOUR NEXT CONVERSATION COULD BE WITH<br>
