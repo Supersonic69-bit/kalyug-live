@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ff1493">
 <title>KALYUG LIVE — Enter the Unknown</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <style>
 :root {
   --pink: #ff1493;
@@ -16,39 +15,32 @@
   --white: #fff;
   --yellow: #faff00;
 }
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
 html, body {
   min-height: 100%;
   background: var(--pink);
 }
-
 body {
   overflow-x: hidden;
   color: var(--black);
   font-family: "Space Grotesk", sans-serif;
 }
-
 button, video {
   -webkit-tap-highlight-color: transparent;
 }
-
 button {
   touch-action: manipulation;
 }
-
 .page {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
   padding: 22px clamp(16px, 4vw, 36px) 34px;
 }
-
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -56,7 +48,6 @@ button {
   gap: 12px;
   margin-bottom: 22px;
 }
-
 .brand {
   font-family: "Bangers", cursive;
   font-size: clamp(26px, 4vw, 38px);
@@ -66,7 +57,6 @@ button {
   text-shadow: 3px 3px 0 var(--white), 5px 5px 0 var(--black);
   letter-spacing: 2px;
 }
-
 .live-badge {
   background: var(--yellow);
   border: 3px solid var(--black);
@@ -77,13 +67,11 @@ button {
   transform: rotate(-2deg);
   text-align: center;
 }
-
 .hero {
   position: relative;
   text-align: center;
   padding: 16px 0 25px;
 }
-
 .sticker {
   display: inline-block;
   max-width: 100%;
@@ -96,7 +84,6 @@ button {
   transform: rotate(-2deg);
   margin-bottom: 26px;
 }
-
 h1 {
   font-family: "Bangers", cursive;
   font-size: clamp(78px, 15vw, 150px);
@@ -107,8 +94,6 @@ h1 {
   paint-order: stroke fill;
   text-shadow: 4px 4px 0 var(--white), 8px 8px 0 var(--black);
 }
-
-/* NEW: GODFATHER TAGLINE */
 .godfather-tagline {
   margin: 22px auto 0;
   padding: 8px 12px;
@@ -122,7 +107,6 @@ h1 {
   text-shadow: 2px 2px 0 var(--white);
   letter-spacing: .5px;
 }
-
 .hero-description {
   margin: 28px auto 0;
   max-width: 600px;
@@ -130,7 +114,6 @@ h1 {
   font-weight: 800;
   line-height: 1.7;
 }
-
 .highlight {
   display: inline-block;
   background: var(--black);
@@ -138,7 +121,6 @@ h1 {
   padding: 2px 9px;
   margin: 3px;
 }
-
 .doodle {
   position: absolute;
   font-size: clamp(24px, 4vw, 40px);
@@ -146,19 +128,16 @@ h1 {
   -webkit-text-stroke: 1px var(--white);
   pointer-events: none;
 }
-
 .doodle-left {
   top: 65px;
   left: 1%;
   transform: rotate(-15deg);
 }
-
 .doodle-right {
   top: 40px;
   right: 2%;
   transform: rotate(15deg);
 }
-
 .section-heading {
   margin: 25px 0 20px;
   text-align: center;
@@ -166,14 +145,12 @@ h1 {
   font-size: clamp(17px, 3vw, 25px);
   line-height: 1.4;
 }
-
 .video-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
   align-items: stretch;
 }
-
 .video-card {
   min-width: 0;
   padding: 10px;
@@ -181,7 +158,6 @@ h1 {
   border: 4px solid var(--white);
   box-shadow: 7px 7px 0 var(--black);
 }
-
 .video-heading {
   display: flex;
   align-items: center;
@@ -194,7 +170,6 @@ h1 {
   font-size: clamp(17px, 2.5vw, 25px);
   letter-spacing: 1px;
 }
-
 .cam-label {
   border: 2px solid var(--pink);
   padding: 5px 8px;
@@ -203,7 +178,6 @@ h1 {
   font-weight: 700;
   letter-spacing: 1px;
 }
-
 .video-frame {
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -213,14 +187,26 @@ h1 {
   background: radial-gradient(ellipse at center, #49203a 0%, #21101e 42%, #080808 100%);
   border: 3px solid var(--pink);
 }
-
 .video-frame video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   background: var(--black);
 }
-
+.video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  text-align: center;
+  color: var(--white);
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(13px, 2.5vw, 20px);
+  line-height: 1.6;
+  pointer-events: none;
+}
 .controls {
   display: flex;
   justify-content: center;
@@ -229,7 +215,6 @@ h1 {
   gap: 16px;
   margin: 32px auto 20px;
 }
-
 .control-button {
   min-height: 62px;
   padding: 15px 23px;
@@ -244,46 +229,37 @@ h1 {
   cursor: pointer;
   transition: transform .12s ease, box-shadow .12s ease;
 }
-
 .control-button:hover {
   transform: translate(-2px, -2px);
   box-shadow: 8px 8px 0 var(--black);
 }
-
 .control-button:active {
   transform: translate(3px, 3px);
   box-shadow: 2px 2px 0 var(--black);
 }
-
 .control-button:focus-visible {
   outline: 3px dashed var(--black);
   outline-offset: 5px;
 }
-
 .control-button:disabled {
   opacity: .55;
   cursor: not-allowed;
 }
-
 .camera-button {
   background: var(--yellow);
 }
-
 .mic-button {
   background: var(--black);
   color: var(--pink);
   border-color: var(--white);
 }
-
 .next-button {
   min-width: 150px;
 }
-
 .status {
   margin: 28px auto 18px;
   text-align: center;
 }
-
 .status span {
   display: inline-block;
   max-width: 100%;
@@ -295,7 +271,6 @@ h1 {
   font-size: clamp(12px, 2vw, 16px);
   overflow-wrap: anywhere;
 }
-
 .safety-note {
   max-width: 650px;
   margin: 22px auto 0;
@@ -304,14 +279,12 @@ h1 {
   line-height: 1.8;
   font-weight: 600;
 }
-
 footer {
   margin-top: 38px;
   padding: 20px 0 10px;
   border-top: 3px dashed var(--black);
   text-align: center;
 }
-
 .footer-brand {
   font-family: "Bangers", cursive;
   font-size: 29px;
@@ -320,111 +293,90 @@ footer {
   -webkit-text-stroke: 1px var(--white);
   paint-order: stroke fill;
 }
-
 footer p {
   margin-top: 7px;
   font-family: "Permanent Marker", cursive;
   font-size: 13px;
 }
-
 @media (max-width: 600px) {
   .page {
     padding: 18px 16px 28px;
   }
-
   .topbar {
     margin-bottom: 15px;
   }
-
   .brand {
     font-size: 29px;
   }
-
   .live-badge {
     padding: 8px 10px;
     font-size: 10px;
   }
-
   .hero {
     padding: 15px 0;
   }
-
   .sticker {
     margin-bottom: 25px;
     padding: 9px 12px;
     font-size: 12px;
   }
-
   h1 {
     font-size: clamp(76px, 19vw, 112px);
     line-height: .84;
     -webkit-text-stroke-width: 2px;
     text-shadow: 3px 3px 0 var(--white), 6px 6px 0 var(--black);
   }
-
-  /* NEW: MOBILE TAGLINE */
   .godfather-tagline {
     margin-top: 19px;
     padding: 6px 4px;
     font-size: clamp(14px, 4vw, 20px);
     line-height: 1.5;
   }
-
   .hero-description {
     margin-top: 25px;
     font-size: 14px;
     line-height: 1.8;
   }
-
   .doodle-left {
     top: 70px;
     left: -2px;
   }
-
   .doodle-right {
     top: 25px;
     right: 0;
   }
-
   .section-heading {
     margin: 27px 0 18px;
     font-size: 18px;
   }
-
   .video-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
   }
-
   .video-card {
     padding: 10px;
     border-width: 4px;
     box-shadow: 6px 6px 0 var(--black);
   }
-
   .video-heading {
     font-size: 24px;
     padding: 5px 2px 12px;
   }
-
   .cam-label {
     font-size: 11px;
     padding: 6px 9px;
   }
-
   .video-frame {
     aspect-ratio: 4 / 3;
     min-height: 0;
     height: auto;
   }
-
   .controls {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
     margin-top: 30px;
   }
-
   .control-button {
     width: 100%;
     min-width: 0;
@@ -434,64 +386,51 @@ footer p {
     border-width: 3px;
     box-shadow: 5px 5px 0 var(--black);
   }
-
   .next-button {
     grid-column: 1 / -1;
     justify-self: center;
     width: min(220px, 75%);
   }
-
   .status {
     margin-top: 26px;
   }
-
   .status span {
     padding: 12px 13px;
     font-size: 12px;
     line-height: 1.6;
   }
-
   .safety-note {
     font-size: 12px;
     margin-top: 22px;
   }
-
   footer {
     margin-top: 30px;
   }
 }
-
 @media (max-width: 360px) {
   .page {
     padding-right: 12px;
     padding-left: 12px;
   }
-
   .brand {
     font-size: 25px;
   }
-
   .live-badge {
     font-size: 9px;
   }
-
   h1 {
     font-size: 72px;
   }
-
   .video-card {
     padding: 7px;
   }
-
   .video-heading {
     font-size: 21px;
   }
-
   .control-button {
     font-size: 18px;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition: none !important;
@@ -499,136 +438,335 @@ footer p {
 }
 </style>
 </head>
-
 <body>
 <main class="page">
-
   <header class="topbar">
     <div class="brand">KALYUG®</div>
     <div class="live-badge">✦ NO RULES. JUST STRANGERS. ✦</div>
   </header>
-
   <section class="hero">
     <span class="doodle doodle-left">✳</span>
     <span class="doodle doodle-right">★</span>
-
     <div class="sticker">ENTER AT YOUR OWN RISK!</div>
-
     <h1>KALYUG<br>LIVE</h1>
-
     <p class="godfather-tagline">
       KALYUG !<br>
       Only God Can Be the Godfather
     </p>
-
     <p class="hero-description">
       YOUR NEXT CONVERSATION COULD BE WITH<br>
       <span class="highlight">ANYONE.</span><br>
       ENTER THE UNKNOWN.
     </p>
   </section>
-
   <h2 class="section-heading">✦ THE WORLD IS YOUR CHATROOM ✦</h2>
-
   <section class="video-grid">
-
     <article class="video-card">
       <div class="video-heading">
         <span>YOUR SIDE</span>
         <span class="cam-label">CAM 01</span>
       </div>
-
       <div class="video-frame">
         <video id="localVideo" autoplay playsinline muted hidden></video>
+        <div class="video-placeholder" id="localPlaceholder">
+          YOUR CAMERA<br>WILL APPEAR HERE
+        </div>
       </div>
     </article>
-
     <article class="video-card">
       <div class="video-heading">
         <span>THE UNKNOWN</span>
         <span class="cam-label">CAM 02</span>
       </div>
-
       <div class="video-frame">
+        <video id="remoteVideo" autoplay playsinline></video>
+        <div class="video-placeholder" id="remotePlaceholder">
+          YOUR NEXT CONNECTION<br>AWAITS...
+        </div>
       </div>
     </article>
-
   </section>
-
   <section class="controls">
     <button class="control-button camera-button" id="cameraButton" type="button">
       📹 START CAM
     </button>
-
     <button class="control-button mic-button" id="micButton" type="button" disabled>
       🎙 MIC ON
     </button>
-
     <button class="control-button next-button" id="nextButton" type="button">
       NEXT ➜
     </button>
   </section>
-
   <div class="status" aria-live="polite">
     <span id="statusText">✦ READY WHEN YOU ARE ✦</span>
   </div>
-
   <p class="safety-note">
     Be respectful. Protect your privacy. Never share personal information
     with strangers. Camera and microphone access require your permission.
   </p>
-
   <footer>
     <div class="footer-brand">K A L Y U G LIVE</div>
     <p>THE UNKNOWN IS CALLING. ♥</p>
   </footer>
-
 </main>
-
 <script>
+const BACKEND_URL = "https://kalyug-live-1.onrender.com";
 const cameraButton = document.getElementById("cameraButton");
 const micButton = document.getElementById("micButton");
 const nextButton = document.getElementById("nextButton");
 const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+const localPlaceholder = document.getElementById("localPlaceholder");
+const remotePlaceholder = document.getElementById("remotePlaceholder");
 const statusText = document.getElementById("statusText");
-
+let socket = null;
 let mediaStream = null;
+let peerConnection = null;
+let partnerId = null;
 let micEnabled = true;
-
+let isSearching = false;
+let pendingCandidates = [];
+let searchRequestPending = false;
+const rtcConfig = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" }
+  ]
+};
 function setStatus(message) {
   statusText.textContent = message;
 }
-
+function setRemotePlaceholder(message) {
+  remotePlaceholder.textContent = message;
+  remotePlaceholder.hidden = false;
+}
+function clearRemoteVideo() {
+  remoteVideo.srcObject = null;
+  remoteVideo.hidden = true;
+  setRemotePlaceholder("YOUR NEXT CONNECTION\nAWAITS...");
+}
+function connectSocket() {
+  if (socket && socket.connected) return;
+  if (typeof io === "undefined") {
+    setStatus("SOCKET.IO FAILED TO LOAD. REFRESH THE PAGE.");
+    return;
+  }
+  if (socket) {
+    socket.connect();
+    return;
+  }
+  socket = io(BACKEND_URL, {
+    transports: ["websocket", "polling"],
+    reconnection: true,
+    reconnectionAttempts: 10,
+    reconnectionDelay: 1000
+  });
+  socket.on("connect", () => {
+    setStatus("SERVER CONNECTED — START CAM TO BEGIN.");
+    if (searchRequestPending) {
+      searchRequestPending = false;
+      findPartner();
+    }
+  });
+  socket.on("connect_error", (error) => {
+    console.error("Socket connection error:", error.message);
+    setStatus("CONNECTING TO SERVER... PLEASE WAIT.");
+  });
+  socket.on("disconnect", () => {
+    closePeerConnection();
+    partnerId = null;
+    isSearching = false;
+    clearRemoteVideo();
+    setStatus("SERVER DISCONNECTED — RECONNECTING...");
+  });
+  socket.on("waiting", () => {
+    isSearching = true;
+    setStatus("LOOKING FOR A STRANGER... PLEASE WAIT.");
+  });
+  socket.on("matched", async (data) => {
+    if (!data || !data.partnerId) return;
+    partnerId = data.partnerId;
+    isSearching = false;
+    pendingCandidates = [];
+    setStatus("STRANGER FOUND! CONNECTING VIDEO...");
+    setRemotePlaceholder("CONNECTING TO STRANGER...");
+    try {
+      createPeerConnection();
+      // Only one peer initiates the offer to avoid offer collisions.
+      if (socket.id < partnerId) {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit("webrtc_offer", {
+          offer: peerConnection.localDescription
+        });
+      }
+    } catch (error) {
+      console.error("Match setup error:", error);
+      setStatus("CONNECTION FAILED — TAP NEXT TO RETRY.");
+    }
+  });
+  socket.on("webrtc_offer", async (data) => {
+    if (!data || !data.offer || !partnerId) return;
+    try {
+      if (!peerConnection) createPeerConnection();
+      await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.offer)
+      );
+      await flushPendingCandidates();
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      socket.emit("webrtc_answer", {
+        answer: peerConnection.localDescription
+      });
+    } catch (error) {
+      console.error("Offer error:", error);
+      setStatus("VIDEO NEGOTIATION FAILED — TAP NEXT.");
+    }
+  });
+  socket.on("webrtc_answer", async (data) => {
+    if (!data || !data.answer || !peerConnection) return;
+    try {
+      await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.answer)
+      );
+      await flushPendingCandidates();
+      setStatus("CONNECTED — SAY HELLO! ♥");
+    } catch (error) {
+      console.error("Answer error:", error);
+      setStatus("VIDEO CONNECTION FAILED — TAP NEXT.");
+    }
+  });
+  socket.on("webrtc_ice_candidate", async (data) => {
+    if (!data || !data.candidate) return;
+    try {
+      const candidate = new RTCIceCandidate(data.candidate);
+      if (peerConnection && peerConnection.remoteDescription) {
+        await peerConnection.addIceCandidate(candidate);
+      } else {
+        pendingCandidates.push(candidate);
+      }
+    } catch (error) {
+      console.error("ICE candidate error:", error);
+    }
+  });
+  socket.on("partner_disconnected", () => {
+    closePeerConnection();
+    partnerId = null;
+    isSearching = false;
+    clearRemoteVideo();
+    setStatus("STRANGER LEFT — TAP NEXT TO FIND SOMEONE ELSE.");
+  });
+  socket.on("report_received", () => {
+    setStatus("REPORT RECEIVED.");
+  });
+  socket.on("connect", () => {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(track => {
+        if (track.readyState === "ended") {
+          setStatus("CAMERA STOPPED — RESTART YOUR CAMERA.");
+        }
+      });
+    }
+  });
+}
+function createPeerConnection() {
+  closePeerConnection();
+  peerConnection = new RTCPeerConnection(rtcConfig);
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => {
+      peerConnection.addTrack(track, mediaStream);
+    });
+  }
+  peerConnection.ontrack = (event) => {
+    const stream = event.streams && event.streams[0];
+    if (stream) {
+      remoteVideo.srcObject = stream;
+      remoteVideo.hidden = false;
+      remotePlaceholder.hidden = true;
+      remoteVideo.play().catch(error => {
+        console.warn("Remote video autoplay blocked:", error);
+      });
+      setStatus("CONNECTED — SAY HELLO! ♥");
+    }
+  };
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate && socket && partnerId) {
+      socket.emit("webrtc_ice_candidate", {
+        candidate: event.candidate
+      });
+    }
+  };
+  peerConnection.onconnectionstatechange = () => {
+    if (!peerConnection) return;
+    const state = peerConnection.connectionState;
+    if (state === "connected") {
+      setStatus("CONNECTED — SAY HELLO! ♥");
+    } else if (state === "connecting") {
+      setStatus("CONNECTING VIDEO...");
+    } else if (state === "failed") {
+      setStatus("NETWORK CONNECTION FAILED — TRY NEXT.");
+    } else if (state === "disconnected") {
+      setStatus("CONNECTION INTERRUPTED...");
+    }
+  };
+  peerConnection.oniceconnectionstatechange = () => {
+    if (peerConnection &&
+        peerConnection.iceConnectionState === "failed") {
+      setStatus("NETWORK BLOCKED — A TURN SERVER MAY BE NEEDED.");
+    }
+  };
+}
+async function flushPendingCandidates() {
+  if (!peerConnection || !peerConnection.remoteDescription) return;
+  const candidates = pendingCandidates;
+  pendingCandidates = [];
+  for (const candidate of candidates) {
+    try {
+      await peerConnection.addIceCandidate(candidate);
+    } catch (error) {
+      console.error("Queued ICE candidate error:", error);
+    }
+  }
+}
+function closePeerConnection() {
+  if (peerConnection) {
+    peerConnection.ontrack = null;
+    peerConnection.onicecandidate = null;
+    peerConnection.onconnectionstatechange = null;
+    peerConnection.oniceconnectionstatechange = null;
+    peerConnection.close();
+    peerConnection = null;
+  }
+  pendingCandidates = [];
+  clearRemoteVideo();
+}
 async function startCamera() {
   if (!navigator.mediaDevices?.getUserMedia) {
     setStatus("CAMERA NEEDS HTTPS AND A SUPPORTED BROWSER.");
     return;
   }
-
   cameraButton.disabled = true;
-  setStatus("REQUESTING CAMERA ACCESS...");
-
+  setStatus("REQUESTING CAMERA AND MICROPHONE ACCESS...");
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true
     });
-
     localVideo.srcObject = mediaStream;
     localVideo.hidden = false;
-
+    localPlaceholder.hidden = true;
     const audioTracks = mediaStream.getAudioTracks();
     micEnabled = true;
-
-    audioTracks.forEach(track => track.enabled = true);
+    audioTracks.forEach(track => {
+      track.enabled = true;
+    });
     micButton.disabled = audioTracks.length === 0;
     micButton.textContent = "🎙 MIC ON";
-
     cameraButton.textContent = "⏹ STOP CAM";
-    setStatus("CAMERA READY — YOU'RE ON SCREEN!");
+    setStatus("CAMERA READY — TAP NEXT TO FIND A STRANGER.");
+    connectSocket();
   } catch (error) {
     console.error("Camera error:", error);
-
     if (error.name === "NotAllowedError") {
       setStatus("PERMISSION DENIED — ALLOW CAMERA IN SETTINGS.");
     } else if (error.name === "NotFoundError") {
@@ -640,24 +778,44 @@ async function startCamera() {
     cameraButton.disabled = false;
   }
 }
-
 function stopCamera() {
+  isSearching = false;
+  searchRequestPending = false;
+  if (socket && socket.connected) {
+    socket.emit("next_partner");
+  }
+  closePeerConnection();
+  partnerId = null;
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
     mediaStream = null;
   }
-
   localVideo.srcObject = null;
   localVideo.hidden = true;
-
+  localPlaceholder.hidden = false;
   cameraButton.textContent = "📹 START CAM";
   micButton.textContent = "🎙 MIC ON";
   micButton.disabled = true;
   micEnabled = true;
-
   setStatus("CAMERA OFF — READY WHEN YOU ARE.");
 }
-
+function findPartner() {
+  if (!mediaStream) {
+    setStatus("START YOUR CAMERA FIRST, BRO!");
+    return;
+  }
+  if (!socket || !socket.connected) {
+    searchRequestPending = true;
+    setStatus("CONNECTING TO SERVER — PLEASE WAIT...");
+    connectSocket();
+    return;
+  }
+  closePeerConnection();
+  partnerId = null;
+  isSearching = true;
+  setStatus("SEARCHING FOR YOUR NEXT CONNECTION...");
+  socket.emit("find_partner");
+}
 cameraButton.addEventListener("click", () => {
   if (mediaStream) {
     stopCamera();
@@ -665,30 +823,32 @@ cameraButton.addEventListener("click", () => {
     startCamera();
   }
 });
-
 micButton.addEventListener("click", () => {
   if (!mediaStream) return;
-
   micEnabled = !micEnabled;
-
   mediaStream.getAudioTracks().forEach(track => {
     track.enabled = micEnabled;
   });
-
   micButton.textContent = micEnabled ? "🎙 MIC ON" : "🔇 MIC OFF";
   setStatus(micEnabled ? "MICROPHONE ON." : "MICROPHONE MUTED.");
 });
-
 nextButton.addEventListener("click", () => {
-  setStatus("READY FOR YOUR NEXT CONNECTION.");
+  if (!mediaStream) {
+    setStatus("START YOUR CAMERA FIRST, BRO!");
+    return;
+  }
+  findPartner();
 });
-
 window.addEventListener("pagehide", () => {
+  if (socket) socket.disconnect();
+  if (peerConnection) {
+    peerConnection.close();
+  }
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
-    mediaStream = null;
   }
 });
+connectSocket();
 </script>
 </body>
 </html>
