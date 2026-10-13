@@ -1,810 +1,735 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#ff1493">
-<title>KALYUG LIVE — Enter the Unknown</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-<style>
-:root {
-  --pink: #ff1493;
-  --black: #050505;
-  --white: #fff;
-  --yellow: #faff00;
-}
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-text-size-adjust: 100%;
-}
-html, body {
-  min-height: 100%;
-  background: var(--pink);
-}
-body {
-  overflow-x: hidden;
-  color: var(--black);
-  font-family: "Space Grotesk", sans-serif;
-}
-button, video {
-  -webkit-tap-highlight-color: transparent;
-}
-button {
-  touch-action: manipulation;
-}
-.page {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 22px clamp(16px, 4vw, 36px) 34px;
-}
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-.brand {
-  font-family: "Bangers", cursive;
-  font-size: clamp(26px, 4vw, 38px);
-  color: var(--black);
-  -webkit-text-stroke: 1.5px var(--white);
-  paint-order: stroke fill;
-  text-shadow: 3px 3px 0 var(--white), 5px 5px 0 var(--black);
-  letter-spacing: 2px;
-}
-.live-badge {
-  background: var(--yellow);
-  border: 3px solid var(--black);
-  box-shadow: 4px 4px 0 var(--white);
-  padding: 9px 13px;
-  font-family: "Permanent Marker", cursive;
-  font-size: clamp(10px, 2vw, 14px);
-  transform: rotate(-2deg);
-  text-align: center;
-}
-.hero {
-  position: relative;
-  text-align: center;
-  padding: 16px 0 25px;
-}
-.sticker {
-  display: inline-block;
-  max-width: 100%;
-  background: var(--yellow);
-  border: 3px solid var(--black);
-  box-shadow: 4px 4px 0 var(--white);
-  padding: 10px 16px;
-  font-family: "Permanent Marker", cursive;
-  font-size: clamp(11px, 2.5vw, 17px);
-  transform: rotate(-2deg);
-  margin-bottom: 26px;
-}
-h1 {
-  font-family: "Bangers", cursive;
-  font-size: clamp(78px, 15vw, 150px);
-  line-height: .82;
-  letter-spacing: 2px;
-  color: var(--black);
-  -webkit-text-stroke: 2.5px var(--white);
-  paint-order: stroke fill;
-  text-shadow: 4px 4px 0 var(--white), 8px 8px 0 var(--black);
-}
-.godfather-tagline {
-  margin: 22px auto 0;
-  padding: 8px 12px;
-  max-width: 100%;
-  font-family: "Permanent Marker", cursive;
-  font-size: clamp(15px, 3.2vw, 25px);
-  line-height: 1.5;
-  color: var(--black);
-  -webkit-text-stroke: 1px var(--white);
-  paint-order: stroke fill;
-  text-shadow: 2px 2px 0 var(--white);
-  letter-spacing: .5px;
-}
-.hero-description {
-  margin: 28px auto 0;
-  max-width: 600px;
-  font-size: clamp(13px, 2vw, 18px);
-  font-weight: 800;
-  line-height: 1.7;
-}
-.highlight {
-  display: inline-block;
-  background: var(--black);
-  color: var(--pink);
-  padding: 2px 9px;
-  margin: 3px;
-}
-.doodle {
-  position: absolute;
-  font-size: clamp(24px, 4vw, 40px);
-  color: var(--black);
-  -webkit-text-stroke: 1px var(--white);
-  pointer-events: none;
-}
-.doodle-left {
-  top: 65px;
-  left: 1%;
-  transform: rotate(-15deg);
-}
-.doodle-right {
-  top: 40px;
-  right: 2%;
-  transform: rotate(15deg);
-}
-.section-heading {
-  margin: 25px 0 20px;
-  text-align: center;
-  font-family: "Permanent Marker", cursive;
-  font-size: clamp(17px, 3vw, 25px);
-  line-height: 1.4;
-}
-.video-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-  align-items: stretch;
-}
-.video-card {
-  min-width: 0;
-  padding: 10px;
-  background: var(--black);
-  border: 4px solid var(--white);
-  box-shadow: 7px 7px 0 var(--black);
-}
-.video-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 4px 2px 12px;
-  color: var(--pink);
-  font-family: "Bangers", cursive;
-  font-size: clamp(17px, 2.5vw, 25px);
-  letter-spacing: 1px;
-}
-.cam-label {
-  border: 2px solid var(--pink);
-  padding: 5px 8px;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.video-frame {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  min-height: 220px;
-  position: relative;
-  overflow: hidden;
-  background: radial-gradient(ellipse at center, #49203a 0%, #21101e 42%, #080808 100%);
-  border: 3px solid var(--pink);
-}
-.video-frame video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: var(--black);
-}
-.controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin: 32px auto 20px;
-}
-.control-button {
-  min-height: 62px;
-  padding: 15px 23px;
-  background: var(--pink);
-  color: var(--black);
-  border: 4px solid var(--white);
-  border-radius: 7px;
-  box-shadow: 6px 6px 0 var(--black);
-  font-family: "Bangers", cursive;
-  font-size: clamp(20px, 3vw, 27px);
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: transform .12s ease, box-shadow .12s ease;
-}
-.control-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0 var(--black);
-}
-.control-button:active {
-  transform: translate(3px, 3px);
-  box-shadow: 2px 2px 0 var(--black);
-}
-.control-button:focus-visible {
-  outline: 3px dashed var(--black);
-  outline-offset: 5px;
-}
-.control-button:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-.camera-button {
-  background: var(--yellow);
-}
-.mic-button {
-  background: var(--black);
-  color: var(--pink);
-  border-color: var(--white);
-}
-.next-button {
-  min-width: 150px;
-}
-.status {
-  margin: 28px auto 18px;
-  text-align: center;
-}
-.status span {
-  display: inline-block;
-  max-width: 100%;
-  padding: 12px 18px;
-  background: var(--white);
-  border: 3px solid var(--black);
-  box-shadow: 5px 5px 0 var(--black);
-  font-weight: 800;
-  font-size: clamp(12px, 2vw, 16px);
-  overflow-wrap: anywhere;
-}
-.safety-note {
-  max-width: 650px;
-  margin: 22px auto 0;
-  text-align: center;
-  font-size: 13px;
-  line-height: 1.8;
-  font-weight: 600;
-}
-footer {
-  margin-top: 38px;
-  padding: 20px 0 10px;
-  border-top: 3px dashed var(--black);
-  text-align: center;
-}
-.footer-brand {
-  font-family: "Bangers", cursive;
-  font-size: 29px;
-  letter-spacing: 3px;
-  color: var(--black);
-  -webkit-text-stroke: 1px var(--white);
-  paint-order: stroke fill;
-}
-footer p {
-  margin-top: 7px;
-  font-family: "Permanent Marker", cursive;
-  font-size: 13px;
-}
-@media (max-width: 600px) {
-  .page {
-    padding: 18px 16px 28px;
-  }
-  .topbar {
-    margin-bottom: 15px;
-  }
-  .brand {
-    font-size: 29px;
-  }
-  .live-badge {
-    padding: 8px 10px;
-    font-size: 10px;
-  }
-  .hero {
-    padding: 15px 0;
-  }
-  .sticker {
-    margin-bottom: 25px;
-    padding: 9px 12px;
-    font-size: 12px;
-  }
-  h1 {
-    font-size: clamp(76px, 19vw, 112px);
-    line-height: .84;
-    -webkit-text-stroke-width: 2px;
-    text-shadow: 3px 3px 0 var(--white), 6px 6px 0 var(--black);
-  }
-  .godfather-tagline {
-    margin-top: 19px;
-    padding: 6px 4px;
-    font-size: clamp(14px, 4vw, 20px);
-    line-height: 1.5;
-  }
-  .hero-description {
-    margin-top: 25px;
-    font-size: 14px;
-    line-height: 1.8;
-  }
-  .doodle-left {
-    top: 70px;
-    left: -2px;
-  }
-  .doodle-right {
-    top: 25px;
-    right: 0;
-  }
-  .section-heading {
-    margin: 27px 0 18px;
-    font-size: 18px;
-  }
-  .video-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-  }
-  .video-card {
-    padding: 10px;
-    border-width: 4px;
-    box-shadow: 6px 6px 0 var(--black);
-  }
-  .video-heading {
-    font-size: 24px;
-    padding: 5px 2px 12px;
-  }
-  .cam-label {
-    font-size: 11px;
-    padding: 6px 9px;
-  }
-  .video-frame {
-    aspect-ratio: 4 / 3;
-    min-height: 0;
-    height: auto;
-  }
-  .controls {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    margin-top: 30px;
-  }
-  .control-button {
-    width: 100%;
-    min-width: 0;
-    min-height: 64px;
-    padding: 13px 8px;
-    font-size: clamp(19px, 5vw, 24px);
-    border-width: 3px;
-    box-shadow: 5px 5px 0 var(--black);
-  }
-  .next-button {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: min(220px, 75%);
-  }
-  .status {
-    margin-top: 26px;
-  }
-  .status span {
-    padding: 12px 13px;
-    font-size: 12px;
-    line-height: 1.6;
-  }
-  .safety-note {
-    font-size: 12px;
-    margin-top: 22px;
-  }
-  footer {
-    margin-top: 30px;
-  }
-}
-@media (max-width: 360px) {
-  .page {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-  .brand {
-    font-size: 25px;
-  }
-  .live-badge {
-    font-size: 9px;
-  }
-  h1 {
-    font-size: 72px;
-  }
-  .video-card {
-    padding: 7px;
-  }
-  .video-heading {
-    font-size: 21px;
-  }
-  .control-button {
-    font-size: 18px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition: none !important;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ff1493">
+  <title>KALYUG LIVE</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --pink: #ff1493;
+      --black: #050505;
+      --white: #ffffff;
+      --yellow: #ffe600;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    html {
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      background: var(--pink);
+      overscroll-behavior: none;
+      touch-action: pan-y;
+    }
+
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      background: var(--pink);
+      color: var(--black);
+      font-family: "Space Grotesk", sans-serif;
+      overscroll-behavior: none;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button {
+      font: inherit;
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 900px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .topbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      font-family: "Bangers", cursive;
+      font-size: 27px;
+      letter-spacing: 1.5px;
+      line-height: 1;
+      color: var(--black);
+      -webkit-text-stroke: 1px var(--white);
+      text-shadow: 2px 2px 0 var(--white);
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--black);
+      color: var(--white);
+      border: 2px solid var(--white);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff3030;
+      box-shadow: 0 0 8px #ff3030;
+    }
+
+    .hero {
+      width: 100%;
+      text-align: center;
+      padding-top: 2px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Bangers", cursive;
+      font-size: clamp(64px, 15vw, 112px);
+      line-height: 0.9;
+      letter-spacing: 2px;
+      color: var(--black);
+      -webkit-text-stroke: 2px var(--white);
+      text-shadow: 5px 5px 0 var(--white), 8px 8px 0 var(--black);
+      overflow-wrap: anywhere;
+    }
+
+    .tagline {
+      margin: 16px 0 0;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(15px, 4vw, 23px);
+      line-height: 1.35;
+      color: var(--black);
+      -webkit-text-stroke: 0.35px var(--white);
+      text-shadow: 1px 1px 0 var(--white);
+    }
+
+    .tagline .bang {
+      color: var(--yellow);
+      -webkit-text-stroke: 1px var(--black);
+      text-shadow: 2px 2px 0 var(--black);
+    }
+
+    .status {
+      max-width: 100%;
+      min-height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 14px;
+      border: 2px solid var(--black);
+      border-radius: 7px;
+      background: var(--white);
+      color: var(--black);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-align: center;
+      box-shadow: 4px 4px 0 var(--black);
+    }
+
+    .video-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .video-card {
+      min-width: 0;
+      overflow: hidden;
+      background: var(--black);
+      border: 3px solid var(--black);
+      border-radius: 12px;
+      box-shadow: 5px 5px 0 var(--white);
+    }
+
+    .video-heading {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 4px;
+      background: var(--yellow);
+      color: var(--black);
+      font-family: "Bangers", cursive;
+      font-size: clamp(16px, 4vw, 23px);
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .video-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: #151515;
+    }
+
+    .video-stage video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #151515;
+    }
+
+    .video-stage video[hidden] {
+      display: none !important;
+    }
+
+    .video-label {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      z-index: 2;
+      padding: 5px 8px;
+      background: var(--pink);
+      border: 1px solid var(--white);
+      color: var(--black);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .video-label.remote-label {
+      background: var(--yellow);
+    }
+
+    .controls {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+
+    .control-btn {
+      min-height: 52px;
+      padding: 12px 10px;
+      border: 3px solid var(--black);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--black);
+      font-family: "Bangers", cursive;
+      font-size: clamp(17px, 4.5vw, 23px);
+      letter-spacing: 1px;
+      box-shadow: 4px 4px 0 var(--black);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .control-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--black);
+    }
+
+    .control-btn.primary {
+      background: var(--yellow);
+    }
+
+    .control-btn.dark {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--white);
+      box-shadow: 4px 4px 0 var(--white);
+    }
+
+    .control-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .footer {
+      width: 100%;
+      margin-top: auto;
+      padding-top: 8px;
+      text-align: center;
+      font-family: "Permanent Marker", cursive;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--black);
+      text-shadow: 1px 1px 0 var(--white);
+    }
+
+    .small-note {
+      margin: 5px 0 0;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    @media (min-width: 650px) {
+      .app {
+        gap: 22px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .video-grid {
+        gap: 20px;
+      }
+
+      .video-stage {
+        aspect-ratio: 4 / 3;
+      }
+
+      .controls {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 360px) {
+      .app {
+        padding-left: 12px;
+        padding-right: 12px;
+        gap: 15px;
+      }
+
+      .brand {
+        font-size: 23px;
+      }
+
+      .video-grid {
+        gap: 9px;
+      }
+
+      .video-heading {
+        font-size: 15px;
+      }
+
+      .control-btn {
+        font-size: 17px;
+        padding: 10px 6px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<main class="page">
-  <header class="topbar">
-    <div class="brand">KALYUG®</div>
-    <div class="live-badge">✦ NO RULES. JUST STRANGERS. ✦</div>
-  </header>
-  <section class="hero">
-    <span class="doodle doodle-left">✳</span>
-    <span class="doodle doodle-right">★</span>
-    <div class="sticker">ENTER AT YOUR OWN RISK!</div>
-    <h1>KALYUG<br>LIVE</h1>
-    <p class="godfather-tagline">
-      KALYUG !<br>
-      Only God Can Be the Godfather
-    </p>
-    <p class="hero-description">
-      YOUR NEXT CONVERSATION COULD BE WITH<br>
-      <span class="highlight">ANYONE.</span><br>
-      ENTER THE UNKNOWN.
-    </p>
-  </section>
-  <h2 class="section-heading">✦ THE WORLD IS YOUR CHATROOM ✦</h2>
-  <section class="video-grid">
-    <article class="video-card">
-      <div class="video-heading">
-        <span>YOUR SIDE</span>
-        <span class="cam-label">CAM 01</span>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">KALYUG LIVE</div>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        LIVE CHAT
       </div>
-      <div class="video-frame">
-        <video id="localVideo" autoplay playsinline muted hidden></video>
-      </div>
-    </article>
-    <article class="video-card">
-      <div class="video-heading">
-        <span>THE UNKNOWN</span>
-        <span class="cam-label">CAM 02</span>
-      </div>
-      <div class="video-frame">
-        <video id="remoteVideo" autoplay playsinline hidden></video>
-      </div>
-    </article>
-  </section>
-  <section class="controls">
-    <button class="control-button camera-button" id="cameraButton" type="button">
-      📹 START CAM
-    </button>
-    <button class="control-button mic-button" id="micButton" type="button" disabled>
-      🎙 MIC ON
-    </button>
-    <button class="control-button next-button" id="nextButton" type="button">
-      NEXT ➜
-    </button>
-  </section>
-  <div class="status" aria-live="polite">
-    <span id="statusText">✦ READY WHEN YOU ARE ✦</span>
-  </div>
-  <p class="safety-note">
-    Be respectful. Protect your privacy. Never share personal information
-    with strangers. Camera and microphone access require your permission.
-  </p>
-  <footer>
-    <div class="footer-brand">K A L Y U G LIVE</div>
-    <p>THE UNKNOWN IS CALLING. ♥</p>
-  </footer>
-</main>
-<script>
-const BACKEND_URL = "https://kalyug-live-1.onrender.com";
-const cameraButton = document.getElementById("cameraButton");
-const micButton = document.getElementById("micButton");
-const nextButton = document.getElementById("nextButton");
-const localVideo = document.getElementById("localVideo");
-const remoteVideo = document.getElementById("remoteVideo");
-const statusText = document.getElementById("statusText");
-let socket = null;
-let mediaStream = null;
-let peerConnection = null;
-let partnerId = null;
-let micEnabled = true;
-let pendingCandidates = [];
-let searchRequestPending = false;
-let isSearching = false;
-const rtcConfig = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" }
-  ]
-};
-function setStatus(message) {
-  statusText.textContent = message;
-}
-function clearRemoteVideo() {
-  remoteVideo.srcObject = null;
-  remoteVideo.hidden = true;
-}
-function connectSocket() {
-  if (socket && socket.connected) return;
-  if (typeof io === "undefined") {
-    setStatus("SOCKET.IO FAILED TO LOAD. REFRESH THE PAGE.");
-    return;
-  }
-  if (socket) {
-    socket.connect();
-    return;
-  }
-  socket = io(BACKEND_URL, {
-    transports: ["websocket", "polling"],
-    reconnection: true,
-    reconnectionAttempts: 10,
-    reconnectionDelay: 1000
-  });
-  socket.on("connect", () => {
-    if (searchRequestPending) {
-      searchRequestPending = false;
-      findPartner();
-    } else {
-      setStatus("SERVER CONNECTED — START CAM TO BEGIN.");
+    </header>
+
+    <section class="hero">
+      <h1>KALYUG<br>LIVE</h1>
+      <p class="tagline"><span class="bang">KALYUG !</span> Only God Can Be the Godfather</p>
+    </section>
+
+    <div class="status" id="status" role="status" aria-live="polite">
+      READY TO CONNECT
+    </div>
+
+    <section class="video-grid" aria-label="Video chat">
+      <article class="video-card">
+        <div class="video-heading">YOUR SIDE</div>
+        <div class="video-stage">
+          <video id="localVideo" autoplay playsinline muted hidden></video>
+          <span class="video-label">YOU</span>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-heading">THE UNKNOWN</div>
+        <div class="video-stage">
+          <video id="remoteVideo" autoplay playsinline hidden></video>
+          <span class="video-label remote-label">STRANGER</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="controls" aria-label="Call controls">
+      <button class="control-btn primary" id="startBtn" type="button">START CAM</button>
+      <button class="control-btn" id="micBtn" type="button" disabled>MIC ON</button>
+      <button class="control-btn dark" id="nextBtn" type="button" disabled>NEXT</button>
+      <button class="control-btn" id="stopBtn" type="button" disabled>STOP</button>
+    </section>
+
+    <footer class="footer">
+      KALYUG LIVE
+      <p class="small-note">CONNECT WITH THE UNKNOWN</p>
+    </footer>
+  </main>
+
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+  <script>
+    const BACKEND_URL = "https://kalyug-live-1.onrender.com";
+
+    const statusEl = document.getElementById("status");
+    const localVideo = document.getElementById("localVideo");
+    const remoteVideo = document.getElementById("remoteVideo");
+    const startBtn = document.getElementById("startBtn");
+    const micBtn = document.getElementById("micBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const stopBtn = document.getElementById("stopBtn");
+
+    let socket = null;
+    let localStream = null;
+    let peerConnection = null;
+    let partnerId = null;
+    let micEnabled = true;
+    let pendingCandidates = [];
+
+    const rtcConfig = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" }
+      ]
+    };
+
+    function setStatus(message) {
+      statusEl.textContent = message;
     }
-  });
-  socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error.message);
-    setStatus("CONNECTING TO SERVER... PLEASE WAIT.");
-  });
-  socket.on("disconnect", () => {
-    closePeerConnection();
-    partnerId = null;
-    isSearching = false;
-    setStatus("SERVER DISCONNECTED — RECONNECTING...");
-  });
-  socket.on("waiting", () => {
-    isSearching = true;
-    setStatus("LOOKING FOR A STRANGER... PLEASE WAIT.");
-  });
-  socket.on("matched", async (data) => {
-    if (!data || !data.partnerId) return;
-    partnerId = data.partnerId;
-    isSearching = false;
-    pendingCandidates = [];
-    setStatus("STRANGER FOUND! CONNECTING VIDEO...");
-    try {
-      createPeerConnection();
-      if (socket.id < partnerId) {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        socket.emit("webrtc_offer", {
-          offer: peerConnection.localDescription
+
+    function connectSocket() {
+      if (socket && socket.connected) return;
+      if (typeof io === "undefined") {
+        setStatus("CONNECTION LIBRARY FAILED");
+        return;
+      }
+
+      socket = io(BACKEND_URL, {
+        transports: ["websocket", "polling"],
+        reconnection: true
+      });
+
+      socket.on("connect", () => setStatus("SERVER CONNECTED"));
+
+      socket.on("connect_error", () => {
+        setStatus("SERVER CONNECTION ERROR");
+      });
+
+      socket.on("waiting", () => {
+        partnerId = null;
+        setStatus("WAITING FOR A STRANGER...");
+      });
+
+      socket.on("matched", async (data) => {
+        partnerId = typeof data === "string"
+          ? data
+          : data?.partnerId || data?.id || data?.socketId || null;
+
+        if (!partnerId || !localStream) return;
+
+        setStatus("STRANGER CONNECTED");
+        await createPeerConnection();
+
+        if (socket.id < partnerId) {
+          try {
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            socket.emit("webrtc_offer", {
+              to: partnerId,
+              offer: peerConnection.localDescription
+            });
+          } catch (error) {
+            console.error(error);
+            setStatus("CALL SETUP FAILED");
+          }
+        }
+      });
+
+      socket.on("webrtc_offer", async (data) => {
+        try {
+          const from = data?.from || data?.sender;
+          const offer = data?.offer || data?.description;
+          if (from) partnerId = from;
+          if (!offer || !localStream) return;
+
+          await createPeerConnection();
+          await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(offer)
+          );
+
+          const answer = await peerConnection.createAnswer();
+          await peerConnection.setLocalDescription(answer);
+
+          socket.emit("webrtc_answer", {
+            to: partnerId,
+            answer: peerConnection.localDescription
+          });
+
+          await flushCandidates();
+        } catch (error) {
+          console.error(error);
+          setStatus("CALL SETUP FAILED");
+        }
+      });
+
+      socket.on("webrtc_answer", async (data) => {
+        try {
+          const answer = data?.answer || data?.description;
+          if (!answer || !peerConnection) return;
+
+          await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(answer)
+          );
+          await flushCandidates();
+        } catch (error) {
+          console.error(error);
+        }
+      });
+
+      socket.on("webrtc_ice_candidate", async (data) => {
+        try {
+          const candidate = data?.candidate;
+          if (!candidate) return;
+
+          if (!peerConnection || !peerConnection.remoteDescription) {
+            pendingCandidates.push(candidate);
+          } else {
+            await peerConnection.addIceCandidate(
+              new RTCIceCandidate(candidate)
+            );
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      });
+
+      socket.on("partner_disconnected", () => {
+        closePeerConnection();
+        partnerId = null;
+        setStatus("STRANGER DISCONNECTED");
+      });
+
+      socket.on("disconnect", () => {
+        setStatus("SERVER DISCONNECTED");
+      });
+    }
+
+    async function startCamera() {
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          setStatus("OPEN THIS WEBSITE USING HTTPS");
+          return;
+        }
+
+        setStatus("REQUESTING CAMERA...");
+
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: true
         });
+
+        localVideo.srcObject = localStream;
+        localVideo.hidden = false;
+        await localVideo.play().catch(() => {});
+
+        micEnabled = true;
+        micBtn.textContent = "MIC ON";
+        micBtn.disabled = false;
+        nextBtn.disabled = false;
+        stopBtn.disabled = false;
+        startBtn.disabled = true;
+
+        connectSocket();
+        setStatus("CAMERA READY");
+      } catch (error) {
+        console.error(error);
+        setStatus("CAMERA / MIC PERMISSION DENIED");
       }
-    } catch (error) {
-      console.error("Match setup error:", error);
-      setStatus("CONNECTION FAILED — TAP NEXT TO RETRY.");
     }
-  });
-  socket.on("webrtc_offer", async (data) => {
-    if (!data || !data.offer || !partnerId) return;
-    try {
-      if (!peerConnection) createPeerConnection();
-      await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.offer)
-      );
-      await flushPendingCandidates();
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
-      socket.emit("webrtc_answer", {
-        answer: peerConnection.localDescription
+
+    async function createPeerConnection() {
+      if (peerConnection) return;
+
+      peerConnection = new RTCPeerConnection(rtcConfig);
+
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
       });
-    } catch (error) {
-      console.error("Offer error:", error);
-      setStatus("VIDEO NEGOTIATION FAILED — TAP NEXT.");
+
+      peerConnection.ontrack = (event) => {
+        const stream = event.streams?.[0];
+        if (!stream) return;
+
+        remoteVideo.srcObject = stream;
+        remoteVideo.hidden = false;
+        remoteVideo.play().catch(() => {});
+        setStatus("YOU ARE CONNECTED");
+      };
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate && partnerId && socket?.connected) {
+          socket.emit("webrtc_ice_candidate", {
+            to: partnerId,
+            candidate: event.candidate
+          });
+        }
+      };
+
+      peerConnection.onconnectionstatechange = () => {
+        if (!peerConnection) return;
+
+        if (peerConnection.connectionState === "connected") {
+          setStatus("YOU ARE CONNECTED");
+        } else if (peerConnection.connectionState === "failed") {
+          setStatus("CONNECTION FAILED — TRY NEXT");
+        }
+      };
     }
-  });
-  socket.on("webrtc_answer", async (data) => {
-    if (!data || !data.answer || !peerConnection) return;
-    try {
-      await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.answer)
-      );
-      await flushPendingCandidates();
-      setStatus("CONNECTED — SAY HELLO! ♥");
-    } catch (error) {
-      console.error("Answer error:", error);
-      setStatus("VIDEO CONNECTION FAILED — TAP NEXT.");
-    }
-  });
-  socket.on("webrtc_ice_candidate", async (data) => {
-    if (!data || !data.candidate) return;
-    try {
-      const candidate = new RTCIceCandidate(data.candidate);
-      if (peerConnection && peerConnection.remoteDescription) {
-        await peerConnection.addIceCandidate(candidate);
-      } else {
-        pendingCandidates.push(candidate);
+
+    async function flushCandidates() {
+      if (!peerConnection?.remoteDescription) return;
+
+      const queued = [...pendingCandidates];
+      pendingCandidates = [];
+
+      for (const candidate of queued) {
+        try {
+          await peerConnection.addIceCandidate(
+            new RTCIceCandidate(candidate)
+          );
+        } catch (error) {
+          console.error(error);
+        }
       }
-    } catch (error) {
-      console.error("ICE candidate error:", error);
     }
-  });
-  socket.on("partner_disconnected", () => {
-    closePeerConnection();
-    partnerId = null;
-    isSearching = false;
-    setStatus("STRANGER LEFT — TAP NEXT TO FIND SOMEONE ELSE.");
-  });
-}
-function createPeerConnection() {
-  closePeerConnection();
-  peerConnection = new RTCPeerConnection(rtcConfig);
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(track => {
-      peerConnection.addTrack(track, mediaStream);
-    });
-  }
-  peerConnection.ontrack = (event) => {
-    const stream = event.streams && event.streams[0];
-    if (stream) {
-      remoteVideo.srcObject = stream;
-      remoteVideo.hidden = false;
-      remoteVideo.play().catch(error => {
-        console.warn("Remote video autoplay blocked:", error);
+
+    function closePeerConnection() {
+      if (peerConnection) {
+        peerConnection.ontrack = null;
+        peerConnection.onicecandidate = null;
+        peerConnection.close();
+        peerConnection = null;
+      }
+
+      remoteVideo.srcObject = null;
+      remoteVideo.hidden = true;
+      pendingCandidates = [];
+    }
+
+    function findPartner() {
+      if (!socket?.connected) {
+        setStatus("CONNECTING TO SERVER...");
+        connectSocket();
+        return;
+      }
+
+      closePeerConnection();
+      partnerId = null;
+      setStatus("FINDING A STRANGER...");
+      socket.emit("find_partner");
+    }
+
+    function nextPartner() {
+      if (!localStream || !socket?.connected) return;
+
+      closePeerConnection();
+      partnerId = null;
+      socket.emit("next_partner");
+      setStatus("FINDING A STRANGER...");
+    }
+
+    function stopCamera() {
+      closePeerConnection();
+
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+        localStream = null;
+      }
+
+      localVideo.srcObject = null;
+      localVideo.hidden = true;
+
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+
+      partnerId = null;
+      micEnabled = true;
+      startBtn.disabled = false;
+      micBtn.disabled = true;
+      nextBtn.disabled = true;
+      stopBtn.disabled = true;
+      micBtn.textContent = "MIC ON";
+      setStatus("READY TO CONNECT");
+    }
+
+    function toggleMic() {
+      if (!localStream) return;
+
+      micEnabled = !micEnabled;
+      localStream.getAudioTracks().forEach((track) => {
+        track.enabled = micEnabled;
       });
-      setStatus("CONNECTED — SAY HELLO! ♥");
+
+      micBtn.textContent = micEnabled ? "MIC ON" : "MIC OFF";
+      setStatus(micEnabled ? "MICROPHONE ON" : "MICROPHONE OFF");
     }
-  };
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate && socket && partnerId) {
-      socket.emit("webrtc_ice_candidate", {
-        candidate: event.candidate
-      });
-    }
-  };
-  peerConnection.onconnectionstatechange = () => {
-    if (!peerConnection) return;
-    const state = peerConnection.connectionState;
-    if (state === "connected") {
-      setStatus("CONNECTED — SAY HELLO! ♥");
-    } else if (state === "connecting") {
-      setStatus("CONNECTING VIDEO...");
-    } else if (state === "failed") {
-      setStatus("NETWORK CONNECTION FAILED — TRY NEXT.");
-    } else if (state === "disconnected") {
-      setStatus("CONNECTION INTERRUPTED...");
-    }
-  };
-  peerConnection.oniceconnectionstatechange = () => {
-    if (peerConnection &&
-        peerConnection.iceConnectionState === "failed") {
-      setStatus("NETWORK BLOCKED — A TURN SERVER MAY BE NEEDED.");
-    }
-  };
-}
-async function flushPendingCandidates() {
-  if (!peerConnection || !peerConnection.remoteDescription) return;
-  const candidates = pendingCandidates;
-  pendingCandidates = [];
-  for (const candidate of candidates) {
-    try {
-      await peerConnection.addIceCandidate(candidate);
-    } catch (error) {
-      console.error("Queued ICE candidate error:", error);
-    }
-  }
-}
-function closePeerConnection() {
-  if (peerConnection) {
-    peerConnection.ontrack = null;
-    peerConnection.onicecandidate = null;
-    peerConnection.onconnectionstatechange = null;
-    peerConnection.oniceconnectionstatechange = null;
-    peerConnection.close();
-    peerConnection = null;
-  }
-  pendingCandidates = [];
-  clearRemoteVideo();
-}
-async function startCamera() {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    setStatus("CAMERA NEEDS HTTPS AND A SUPPORTED BROWSER.");
-    return;
-  }
-  cameraButton.disabled = true;
-  setStatus("REQUESTING CAMERA AND MICROPHONE ACCESS...");
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true
+
+    startBtn.addEventListener("click", startCamera);
+    micBtn.addEventListener("click", toggleMic);
+    nextBtn.addEventListener("click", nextPartner);
+    stopBtn.addEventListener("click", stopCamera);
+
+    // Block two-finger pinch gestures where the browser permits it.
+    document.addEventListener("touchmove", (event) => {
+      if (event.touches && event.touches.length > 1) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    // Block double-tap zoom where supported.
+    let lastTouchEnd = 0;
+
+    document.addEventListener("touchend", (event) => {
+      const now = Date.now();
+
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+
+      lastTouchEnd = now;
+    }, { passive: false });
+
+    // Prevent browser gesture events where supported.
+    ["gesturestart", "gesturechange", "gestureend"].forEach((type) => {
+      document.addEventListener(type, (event) => {
+        event.preventDefault();
+      }, { passive: false });
     });
-    localVideo.srcObject = mediaStream;
-    localVideo.hidden = false;
-    const audioTracks = mediaStream.getAudioTracks();
-    micEnabled = true;
-    audioTracks.forEach(track => {
-      track.enabled = true;
-    });
-    micButton.disabled = audioTracks.length === 0;
-    micButton.textContent = "🎙 MIC ON";
-    cameraButton.textContent = "⏹ STOP CAM";
-    setStatus("CAMERA READY — TAP NEXT TO FIND A STRANGER.");
+
     connectSocket();
-  } catch (error) {
-    console.error("Camera error:", error);
-    if (error.name === "NotAllowedError") {
-      setStatus("PERMISSION DENIED — ALLOW CAMERA IN SETTINGS.");
-    } else if (error.name === "NotFoundError") {
-      setStatus("NO CAMERA OR MICROPHONE FOUND.");
-    } else {
-      setStatus("COULDN'T START CAMERA. TRY AGAIN.");
-    }
-  } finally {
-    cameraButton.disabled = false;
-  }
-}
-function stopCamera() {
-  searchRequestPending = false;
-  if (socket && socket.connected) {
-    socket.emit("next_partner");
-  }
-  closePeerConnection();
-  partnerId = null;
-  isSearching = false;
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(track => track.stop());
-    mediaStream = null;
-  }
-  localVideo.srcObject = null;
-  localVideo.hidden = true;
-  cameraButton.textContent = "📹 START CAM";
-  micButton.textContent = "🎙 MIC ON";
-  micButton.disabled = true;
-  micEnabled = true;
-  setStatus("CAMERA OFF — READY WHEN YOU ARE.");
-}
-function findPartner() {
-  if (!mediaStream) {
-    setStatus("START YOUR CAMERA FIRST, BRO!");
-    return;
-  }
-  if (!socket || !socket.connected) {
-    searchRequestPending = true;
-    setStatus("CONNECTING TO SERVER — PLEASE WAIT...");
-    connectSocket();
-    return;
-  }
-  closePeerConnection();
-  partnerId = null;
-  isSearching = true;
-  setStatus("SEARCHING FOR YOUR NEXT CONNECTION...");
-  socket.emit("find_partner");
-}
-cameraButton.addEventListener("click", () => {
-  if (mediaStream) {
-    stopCamera();
-  } else {
-    startCamera();
-  }
-});
-micButton.addEventListener("click", () => {
-  if (!mediaStream) return;
-  micEnabled = !micEnabled;
-  mediaStream.getAudioTracks().forEach(track => {
-    track.enabled = micEnabled;
-  });
-  micButton.textContent = micEnabled ? "🎙 MIC ON" : "🔇 MIC OFF";
-  setStatus(micEnabled ? "MICROPHONE ON." : "MICROPHONE MUTED.");
-});
-nextButton.addEventListener("click", () => {
-  if (!mediaStream) {
-    setStatus("START YOUR CAMERA FIRST, BRO!");
-    return;
-  }
-  findPartner();
-});
-window.addEventListener("pagehide", () => {
-  if (socket) socket.disconnect();
-  if (peerConnection) {
-    peerConnection.close();
-  }
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(track => track.stop());
-  }
-});
-connectSocket();
-</script>
+  </script>
 </body>
 </html>
