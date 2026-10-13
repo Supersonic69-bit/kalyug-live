@@ -193,20 +193,6 @@ h1 {
   object-fit: cover;
   background: var(--black);
 }
-.video-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-  text-align: center;
-  color: var(--white);
-  font-family: "Permanent Marker", cursive;
-  font-size: clamp(13px, 2.5vw, 20px);
-  line-height: 1.6;
-  pointer-events: none;
-}
 .controls {
   display: flex;
   justify-content: center;
@@ -468,9 +454,6 @@ footer p {
       </div>
       <div class="video-frame">
         <video id="localVideo" autoplay playsinline muted hidden></video>
-        <div class="video-placeholder" id="localPlaceholder">
-          YOUR CAMERA<br>WILL APPEAR HERE
-        </div>
       </div>
     </article>
     <article class="video-card">
@@ -479,10 +462,7 @@ footer p {
         <span class="cam-label">CAM 02</span>
       </div>
       <div class="video-frame">
-        <video id="remoteVideo" autoplay playsinline></video>
-        <div class="video-placeholder" id="remotePlaceholder">
-          YOUR NEXT CONNECTION<br>AWAITS...
-        </div>
+        <video id="remoteVideo" autoplay playsinline hidden></video>
       </div>
     </article>
   </section>
@@ -516,17 +496,15 @@ const micButton = document.getElementById("micButton");
 const nextButton = document.getElementById("nextButton");
 const localVideo = document.getElementById("localVideo");
 const remoteVideo = document.getElementById("remoteVideo");
-const localPlaceholder = document.getElementById("localPlaceholder");
-const remotePlaceholder = document.getElementById("remotePlaceholder");
 const statusText = document.getElementById("statusText");
 let socket = null;
 let mediaStream = null;
 let peerConnection = null;
 let partnerId = null;
 let micEnabled = true;
-let isSearching = false;
 let pendingCandidates = [];
 let searchRequestPending = false;
+let isSearching = false;
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -536,14 +514,9 @@ const rtcConfig = {
 function setStatus(message) {
   statusText.textContent = message;
 }
-function setRemotePlaceholder(message) {
-  remotePlaceholder.textContent = message;
-  remotePlaceholder.hidden = false;
-}
 function clearRemoteVideo() {
   remoteVideo.srcObject = null;
   remoteVideo.hidden = true;
-  setRemotePlaceholder("YOUR NEXT CONNECTION\nAWAITS...");
 }
 function connectSocket() {
   if (socket && socket.connected) return;
@@ -562,10 +535,11 @@ function connectSocket() {
     reconnectionDelay: 1000
   });
   socket.on("connect", () => {
-    setStatus("SERVER CONNECTED — START CAM TO BEGIN.");
     if (searchRequestPending) {
       searchRequestPending = false;
       findPartner();
+    } else {
+      setStatus("SERVER CONNECTED — START CAM TO BEGIN.");
     }
   });
   socket.on("connect_error", (error) => {
@@ -576,7 +550,6 @@ function connectSocket() {
     closePeerConnection();
     partnerId = null;
     isSearching = false;
-    clearRemoteVideo();
     setStatus("SERVER DISCONNECTED — RECONNECTING...");
   });
   socket.on("waiting", () => {
@@ -589,10 +562,8 @@ function connectSocket() {
     isSearching = false;
     pendingCandidates = [];
     setStatus("STRANGER FOUND! CONNECTING VIDEO...");
-    setRemotePlaceholder("CONNECTING TO STRANGER...");
     try {
       createPeerConnection();
-      // Only one peer initiates the offer to avoid offer collisions.
       if (socket.id < partnerId) {
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
@@ -653,20 +624,7 @@ function connectSocket() {
     closePeerConnection();
     partnerId = null;
     isSearching = false;
-    clearRemoteVideo();
     setStatus("STRANGER LEFT — TAP NEXT TO FIND SOMEONE ELSE.");
-  });
-  socket.on("report_received", () => {
-    setStatus("REPORT RECEIVED.");
-  });
-  socket.on("connect", () => {
-    if (mediaStream) {
-      mediaStream.getTracks().forEach(track => {
-        if (track.readyState === "ended") {
-          setStatus("CAMERA STOPPED — RESTART YOUR CAMERA.");
-        }
-      });
-    }
   });
 }
 function createPeerConnection() {
@@ -682,7 +640,6 @@ function createPeerConnection() {
     if (stream) {
       remoteVideo.srcObject = stream;
       remoteVideo.hidden = false;
-      remotePlaceholder.hidden = true;
       remoteVideo.play().catch(error => {
         console.warn("Remote video autoplay blocked:", error);
       });
@@ -754,7 +711,6 @@ async function startCamera() {
     });
     localVideo.srcObject = mediaStream;
     localVideo.hidden = false;
-    localPlaceholder.hidden = true;
     const audioTracks = mediaStream.getAudioTracks();
     micEnabled = true;
     audioTracks.forEach(track => {
@@ -779,20 +735,19 @@ async function startCamera() {
   }
 }
 function stopCamera() {
-  isSearching = false;
   searchRequestPending = false;
   if (socket && socket.connected) {
     socket.emit("next_partner");
   }
   closePeerConnection();
   partnerId = null;
+  isSearching = false;
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
     mediaStream = null;
   }
   localVideo.srcObject = null;
   localVideo.hidden = true;
-  localPlaceholder.hidden = false;
   cameraButton.textContent = "📹 START CAM";
   micButton.textContent = "🎙 MIC ON";
   micButton.disabled = true;
