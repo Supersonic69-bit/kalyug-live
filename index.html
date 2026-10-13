@@ -1,546 +1,66 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#080008" />
-  <meta name="description" content="KALYUG LIVE — The unknown is calling. Meet new people through random video chat." />
-  <title>KALYUG LIVE — The Unknown Is Calling</title>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Permanent+Marker&display=swap');
-
-    :root {
-      --pink: #ff1493;
-      --hot: #ff35bd;
-      --purple: #9c27ff;
-      --bg: #080008;
-      --panel: #16091a;
-      --muted: #b8a6b9;
-      --border: rgba(255, 20, 147, .42);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: #fff;
-      font-family: 'Space Grotesk', sans-serif;
-      background:
-        radial-gradient(ellipse at 15% 5%, #3c0734 0, transparent 35%),
-        radial-gradient(ellipse at 95% 35%, #29063f 0, transparent 34%),
-        var(--bg);
-    }
-
-    button, select { font: inherit; }
-    button { cursor: pointer; }
-
-    button:focus-visible, select:focus-visible {
-      outline: 2px solid white;
-      outline-offset: 4px;
-    }
-
-    .topbar {
-      max-width: 1300px;
-      margin: auto;
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .brand {
-      color: white;
-      text-decoration: none;
-      font-family: 'Permanent Marker', cursive;
-      font-size: clamp(25px, 5vw, 42px);
-      line-height: 1;
-      transform: rotate(-3deg);
-      text-shadow: 0 0 10px var(--pink), 0 0 28px var(--purple);
-    }
-
-    .brand span { color: var(--hot); }
-
-    .nav {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .nav a {
-      color: #eee;
-      text-decoration: none;
-      padding: 9px 13px;
-      border-radius: 12px;
-      font-size: 14px;
-    }
-
-    .nav a:hover {
-      background: #39102f;
-      color: #ff83d6;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 30px 16px 24px;
-    }
-
-    .eyebrow {
-      color: #ff81d4;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    h1 {
-      font-family: 'Permanent Marker', cursive;
-      font-size: clamp(35px, 7vw, 66px);
-      line-height: 1.05;
-      margin: 13px 0;
-      transform: rotate(-2deg);
-    }
-
-    h1 span {
-      color: var(--hot);
-      text-shadow: 0 0 12px var(--pink), 0 0 35px #b000ff;
-    }
-
-    .hero p {
-      color: var(--muted);
-      font-size: 14px;
-      margin: 20px 0 0;
-    }
-
-    .wrap {
-      max-width: 1200px;
-      padding: 0 20px 40px;
-      margin: auto;
-    }
-
-    .videos {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .video-card {
-      position: relative;
-      min-width: 0;
-      aspect-ratio: 4 / 3;
-      overflow: hidden;
-      background: linear-gradient(135deg, #260b2b, #09050d 65%, #31052e);
-      border: 1.5px solid var(--pink);
-      border-radius: 20px;
-      box-shadow: 0 0 14px #ff149326, inset 0 0 35px #ff14930c;
-    }
-
-    .video-card video {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      background: transparent;
-    }
-
-    .video-card video.mirror { transform: scaleX(-1); }
-
-    .video-label {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      z-index: 2;
-      background: #100711d9;
-      border: 1px solid #ff35bd55;
-      border-radius: 30px;
-      padding: 8px 12px;
-      font-size: 12px;
-      backdrop-filter: blur(8px);
-    }
-
-    .video-label::before {
-      content: "";
-      display: inline-block;
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
-      margin-right: 7px;
-      background: #35f59a;
-      box-shadow: 0 0 8px #35f59a;
-    }
-
-    .remote-label::before {
-      background: var(--pink);
-      box-shadow: 0 0 8px var(--pink);
-    }
-
-    .video-bottom {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      right: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-    }
-
-    .icon-button {
-      pointer-events: auto;
-      width: 42px;
-      height: 42px;
-      border: 1px solid #ff62cc;
-      border-radius: 50%;
-      background: #130713d9;
-      color: white;
-      font-size: 17px;
-    }
-
-    .icon-button:hover { background: #8d0a68; }
-
-    .placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-      text-align: center;
-      color: var(--muted);
-      gap: 10px;
-    }
-
-    .question {
-      color: var(--hot);
-      font-size: clamp(65px, 10vw, 115px);
-      line-height: 1;
-      font-weight: 800;
-      text-shadow: 0 0 25px var(--pink);
-    }
-
-    .placeholder strong { color: white; font-size: 14px; }
-    .placeholder small { max-width: 230px; line-height: 1.6; }
-
-    .controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin: 22px 0;
-    }
-
-    .btn {
-      padding: 15px 24px;
-      border: 1px solid #594253;
-      border-radius: 16px;
-      background: #19121b;
-      color: white;
-      font-weight: 700;
-      transition: transform .15s, box-shadow .15s;
-    }
-
-    .btn:hover { transform: translateY(-2px); }
-
-    .btn-primary {
-      min-width: 190px;
-      background: linear-gradient(100deg, #ff008c, #ed00c9);
-      border-color: #ff65d4;
-      box-shadow: 0 0 22px #ff14934d;
-    }
-
-    .btn-primary:hover { box-shadow: 0 0 32px #ff1493a0; }
-    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-
-    .status {
-      min-height: 24px;
-      text-align: center;
-      color: #ff9cdd;
-      font-size: 13px;
-      margin: 10px 0 22px;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 25px;
-    }
-
-    .feature {
-      padding: 19px;
-      border: 1px solid #4d123e;
-      border-radius: 16px;
-      background: linear-gradient(145deg, #1b0b1b, #0c070d);
-    }
-
-    .feature .emoji { font-size: 25px; }
-    .feature h3 { font-size: 14px; margin: 10px 0 6px; }
-    .feature p { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 0; }
-
-    .notice {
-      margin-top: 22px;
-      border: 1px solid #48213f;
-      border-radius: 12px;
-      padding: 14px 16px;
-      color: #c9b9c8;
-      background: #100811;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    footer {
-      text-align: center;
-      padding: 24px 16px;
-      border-top: 1px solid var(--border);
-      color: #8f7e90;
-      font-size: 11px;
-      letter-spacing: 1px;
-    }
-
-    footer strong { color: var(--hot); }
-
-    @media (max-width: 650px) {
-      .topbar { padding: 18px 15px; flex-wrap: wrap; }
-      .nav { gap: 0; }
-      .nav a { padding: 8px; font-size: 12px; }
-      .hero { padding: 27px 12px 23px; }
-      .wrap { padding: 0 12px 28px; }
-      .videos { grid-template-columns: 1fr; gap: 12px; }
-      .video-card { aspect-ratio: 4 / 3; }
-      .controls { gap: 8px; }
-      .btn { padding: 13px 16px; font-size: 13px; }
-      .btn-primary { min-width: 125px; }
-      .features { grid-template-columns: 1fr; gap: 10px; }
-      .feature { display: grid; grid-template-columns: 35px 1fr; column-gap: 10px; }
-      .feature .emoji { grid-row: span 2; }
-      .feature h3 { margin: 0 0 5px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
-    }
-  </style>
-</head>
-
-<body>
-  <header class="topbar">
-    <a class="brand" href="#" aria-label="Kalyug Live home">
-      KALYUG <span>LIVE</span>
-    </a>
-
-    <nav class="nav" aria-label="Main navigation">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#safety">Safety</a>
-    </nav>
-  </header>
-
-  <main id="home">
-    <section class="hero">
-      <div class="eyebrow">✦ No scripts. No expectations. ✦</div>
-      <h1>THE UNKNOWN<br><span>IS CALLING...</span> ♥</h1>
-      <p>Strangers today. Stories tonight. ✨</p>
-    </section>
-
-    <div class="wrap">
-      <section class="videos" aria-label="Video chat">
-        <div class="video-card">
-          <div class="video-label">You</div>
-          <video id="localVideo" class="mirror" autoplay muted playsinline></video>
-
-          <div id="cameraPlaceholder" class="placeholder">
-            <div class="question">♡</div>
-            <strong>Your camera goes here</strong>
-            <small>Tap “Enable Camera” to preview your video.</small>
-          </div>
-
-          <div class="video-bottom">
-            <button class="icon-button" id="micBtn" aria-label="Toggle microphone" title="Toggle microphone">🎙</button>
-            <button class="icon-button" id="cameraBtn" aria-label="Toggle camera" title="Toggle camera">▣</button>
-          </div>
-        </div>
-
-        <div class="video-card">
-          <div class="video-label remote-label">Stranger</div>
-          <div class="placeholder" id="remotePlaceholder">
-            <div class="question">?</div>
-            <strong id="remoteTitle">Waiting for a stranger...</strong>
-            <small id="remoteDescription">Your next unexpected conversation starts here.</small>
-          </div>
-          <video id="remoteVideo" autoplay playsinline hidden></video>
-        </div>
-      </section>
-
-      <div class="controls">
-        <button class="btn" id="stopBtn">◉ Stop</button>
-        <button class="btn btn-primary" id="startBtn">📹 Enable Camera</button>
-        <button class="btn" id="nextBtn">↻ Next</button>
-        <button class="btn" id="reportBtn">⚑ Report</button>
-      </div>
-
-      <div class="status" id="status" role="status" aria-live="polite">
-        Ready when you are ✨
-      </div>
-
-      <section class="features" id="about">
-        <article class="feature">
-          <div class="emoji">⚡</div>
-          <h3>RANDOM VIDEO CHAT</h3>
-          <p>Meet new people and discover unexpected stories.</p>
-        </article>
-        <article class="feature">
-          <div class="emoji">🎭</div>
-          <h3>YOUR PRIVACY MATTERS</h3>
-          <p>Camera access starts only when you choose to enable it.</p>
-        </article>
-        <article class="feature">
-          <div class="emoji">💗</div>
-          <h3>MEET NEW PEOPLE</h3>
-          <p>Every stranger has a story. Make your next connection count.</p>
-        </article>
-      </section>
-
-      <section class="notice" id="safety">
-        <strong>💗 Stay safe online.</strong>
-        Never share passwords, financial details, your home address or other sensitive information with strangers. Leave any uncomfortable conversation. Reporting will be connected to a moderation system before public launch.
-      </section>
-    </div>
-  </main>
-
-  <footer>
-    <strong>K A L Y U G &nbsp; L I V E</strong><br><br>
-    THE UNKNOWN IS CALLING. ♥<br><br>
-    Prototype · Random matching is not connected yet.
-  </footer>
-
-  <script>
-    const localVideo = document.getElementById('localVideo');
-    const cameraPlaceholder = document.getElementById('cameraPlaceholder');
-    const statusText = document.getElementById('status');
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const micBtn = document.getElementById('micBtn');
-    const cameraBtn = document.getElementById('cameraBtn');
-
-    let localStream = null;
-    let micEnabled = true;
-    let cameraEnabled = true;
-
-    function setStatus(message) {
-      statusText.textContent = message;
-    }
-
-    async function enableCamera() {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        setStatus('Camera needs HTTPS. Open the deployed site in Safari and try again.');
-        return;
-      }
-
-      startBtn.disabled = true;
-      setStatus('Requesting camera permission...');
-
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
-          audio: true
-        });
-
-        localVideo.srcObject = localStream;
-        cameraPlaceholder.hidden = true;
-        micEnabled = true;
-        cameraEnabled = true;
-        updateMediaButtons();
-        setStatus('Camera ready! Random matching will be added in the next step.');
-        startBtn.textContent = '✓ Camera Enabled';
-      } catch (error) {
-        console.error('Camera permission error:', error);
-
-        if (error.name === 'NotAllowedError') {
-          setStatus('Camera or microphone permission denied. Allow access in browser settings.');
-        } else if (error.name === 'NotFoundError') {
-          setStatus('No compatible camera or microphone was found.');
-        } else {
-          setStatus('Could not access camera. Check permissions and try again.');
-        }
-      } finally {
-        startBtn.disabled = false;
-      }
-    }
-
-    function updateMediaButtons() {
-      micBtn.textContent = micEnabled ? '🎙' : '🔇';
-      cameraBtn.textContent = cameraEnabled ? '▣' : '✕';
-      micBtn.setAttribute('aria-pressed', String(micEnabled));
-      cameraBtn.setAttribute('aria-pressed', String(cameraEnabled));
-    }
-
-    micBtn.addEventListener('click', () => {
-      if (!localStream) {
-        setStatus('Enable your camera first.');
-        return;
-      }
-
-      micEnabled = !micEnabled;
-      localStream.getAudioTracks().forEach(track => {
-        track.enabled = micEnabled;
-      });
-      updateMediaButtons();
-      setStatus(micEnabled ? 'Microphone on.' : 'Microphone muted.');
-    });
-
-    cameraBtn.addEventListener('click', () => {
-      if (!localStream) {
-        setStatus('Enable your camera first.');
-        return;
-      }
-
-      cameraEnabled = !cameraEnabled;
-      localStream.getVideoTracks().forEach(track => {
-        track.enabled = cameraEnabled;
-      });
-      updateMediaButtons();
-      setStatus(cameraEnabled ? 'Camera on.' : 'Camera paused.');
-    });
-
-    function stopCamera() {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-        localStream = null;
-      }
-
-      localVideo.srcObject = null;
-      cameraPlaceholder.hidden = false;
-      startBtn.textContent = '📹 Enable Camera';
-      micEnabled = true;
-      cameraEnabled = true;
-      updateMediaButtons();
-      setStatus('Camera stopped. You can enable it again anytime.');
-    }
-
-    startBtn.addEventListener('click', enableCamera);
-    stopBtn.addEventListener('click', stopCamera);
-
-    nextBtn.addEventListener('click', () => {
-      setStatus('Random matching is not connected yet. We will add it next!');
-    });
-
-    document.getElementById('reportBtn').addEventListener('click', () => {
-      setStatus('Reporting will be available after the safety and moderation system is connected.');
-    });
-
-    window.addEventListener('pagehide', () => {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
-    });
-  </script>
-</body>
-</html>
-
+/* FUNKY PINK THEME */
+:root {
+  --pink: #ff1493;
+  --hot-pink: #ff00a8;
+  --black: #000000;
+  --white: #ffffff;
+}
+
+body {
+  background: #ff1493;
+  color: #000000;
+  font-family: 'Bangers', cursive;
+}
+
+/* BLACK FONT + THICK WHITE OUTLINE */
+.logo,
+h1,
+.headline {
+  color: #000000;
+  -webkit-text-stroke: 2px #ffffff;
+  paint-order: stroke fill;
+  text-shadow:
+    3px 3px 0 #ffffff,
+    -2px -2px 0 #ffffff;
+  font-family: 'Bangers', cursive;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+/* FUNKY PINK BUTTONS */
+button {
+  background: #ff1493;
+  color: #000000;
+  border: 3px solid #ffffff;
+  border-radius: 8px;
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  box-shadow: 5px 5px 0 #000000;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translate(-2px, -2px);
+}
+
+/* BLACK PANELS WITH PINK ACCENTS */
+.video-panel,
+.card {
+  background: #000000;
+  border: 3px solid #ff1493;
+  box-shadow: 6px 6px 0 #ffffff;
+}
+
+/* WHITE OUTLINE FOR ALL BIG TEXT */
+h2,
+h3 {
+  color: #000000;
+  -webkit-text-stroke: 1.5px #ffffff;
+  paint-order: stroke fill;
+}
+
+/* FONTS */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Space+Grotesk:wght@400;600;700&display=swap');
